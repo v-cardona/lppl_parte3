@@ -1,0 +1,5 @@
+1. expresion : registro.campo
+    al asignarlo al $$.pos tambien se actualiza el punter del campo al valor de la expresion?
+    
+2. en el while, cuando se hace el goto que se pone en el campo res?
+    y al lanzarlo se queja

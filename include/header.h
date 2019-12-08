@@ -32,9 +32,25 @@ struct CamposStruct {    /* Estructura para los campos de un registro */
   int talla;
   int ref;
 }CAMPOSSTRUCT;
+
 struct ExpreStruct {    /* Estructura para los campos de un registro */
   int tipo;
   int pos;
 }EXPRESTRUCT;
+
+struct OperadorStruct {    /* Estructura para los campos del operador */
+  int tipo;
+  int cod;
+}OPERADORSTRUCT;
+
+struct ConstanteStruct {    /* Estructura para los campos de las constantes */
+  int tipo;
+  int cod;
+}CONSTANTESTRUCT;
+
+struct InstruccionStruct {    /* Estructura para el while */
+  int ini;
+  int fin;
+}INSTRUCCIONSTRUCT;
 #endif  /* _HEADER_H */
 /*****************************************************************************/
