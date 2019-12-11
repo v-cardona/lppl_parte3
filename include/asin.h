@@ -94,14 +94,18 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 13 "src/asin.y" /* yacc.c:1909  */
-/********************************************************************/
-  int   cent;                 /* Para el terminal "cte" entera              */
-  char  *ident;               /* Nombre del identificador                   */
-  int tipo;                   /* Tipo del simbolo                           */
-  struct CamposStruct lisCampos;  
+#line 14 "src/asin.y" /* yacc.c:1909  */
+/*********************************************************************/
+  int   cent;                               /* Para el terminal "cte" entera */
+  char  *ident;                                  /* Nombre del identificador */
+  int tipo;                                              /* Tipo del simbolo */
+  struct CamposStruct lisCampos;  /* Estructura para los campos del registro */
+  int pos;      /* Posicion del simbolo en memoria (desplazamiento relativo) */
+  struct ExpreStruct tipoExpre;         /*Estructura para la posicion y tipo */
+  struct OperadorStruct tipoOp;       /*Estructura para la posicion y codigo */
+  struct ConstanteStruct tipoCons;    /*Estructura para la posicion y numero */
 
-#line 105 "asin.h" /* yacc.c:1909  */
+#line 109 "asin.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

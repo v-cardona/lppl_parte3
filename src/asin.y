@@ -8,6 +8,7 @@
 #include <string.h>
 #include "header.h"
 #include "libtds.h"
+#include "libgci.h"
 %}
 
 %union {/*********************************************************************/
@@ -19,7 +20,6 @@
   struct ExpreStruct tipoExpre;         /*Estructura para la posicion y tipo */
   struct OperadorStruct tipoOp;       /*Estructura para la posicion y codigo */
   struct ConstanteStruct tipoCons;    /*Estructura para la posicion y numero */
-  struct INSTRUCCIONSTRUCT instruccionStr; /*Estructura para las intrucciones de flujo */
 }/****************************************************************************/
 
 %token MAS_ MENOS_ POR_ DIV_ MOD_
@@ -43,7 +43,6 @@ DELI_ PUNTO_
 %type<tipoOp> operadorUnario operadorAsignacion
 %type<tipo> operadorAditivo operadorRelacional operadorMultiplicativo operadorIncremento operadorLogico operadorIgualdad
 %type<tipoCons> constante 
-%type<instruccionStr> instruccionIteracion instruccionSeleccion
 %%
 programa
   : { dvar = 0; si = 0;} 
@@ -179,41 +178,41 @@ instruccionEntradaSalida
 instruccionSeleccion
   : IF_ APAR_ expresion CPAR_ 
     {
-      if ($3 != T_LOGICO && $3 != T_ERROR) {
+      if ($3.tipo != T_LOGICO && $3.tipo != T_ERROR) {
         yyerror("La condicion del if debe ser logica");
       }
-      $$.ini = creaLans(si);
-      emite(EIGUAL, crArgPos($3.pos), crArgEnt(FALSE), crArgEtq($$.ini));
+      $<cent>$ = creaLans(si);
+      emite(EIGUAL, crArgPos($3.pos), crArgEnt(FALSE), crArgEtq(-1));
     }
     instruccion
     {
-      $$.fin = creaLans(si);
-      emite(GOTOS, crArgNul(), crArgNul(), crArgEtq($$.fin));
-      completaLans($$.ini, si);
+      $<cent>$ = creaLans(si);
+      emite(GOTOS, crArgNul(), crArgNul(), crArgEtq(-1));
+      completaLans($<cent>5, crArgEnt(si));
     }
     ELSE_ instruccion
     {
-      completaLans($$.fin, si);
+      completaLans($<cent>7, crArgEnt(si));
     }
   ;
 
 instruccionIteracion
   : WHILE_ 
     {
-      $$.ini = si;
+      $<cent>$ = si;
     }
     APAR_ expresion 
     {
-      if ($3.tipo != T_LOGICO && $3.tipo != T_ERROR) {
+      if ($4.tipo != T_LOGICO && $4.tipo != T_ERROR) {
         yyerror("La condicion del while deber ser logica");
       }
-      $$.fin = creaLans(si);
-      emite(EIGUAL, crArgPos($3.pos), crArgEnt(FALSE), crArgEtq($$.fin));
+      $<cent>$ = creaLans(si);
+      emite(EIGUAL, crArgPos($4.pos), crArgEnt(FALSE), crArgEtq(-1));
     }
     CPAR_ instruccion
     {
-      emite(GOTOS, crArgNul(), crArgNul(), crArgEtq($$.ini));
-      completaLans($$.fin, si);
+      emite(GOTOS, crArgNul(), crArgNul(), crArgEtq($<cent>2));
+      completaLans($<cent>5, crArgEnt(si));
     }
 
   ;
@@ -251,7 +250,7 @@ expresion
         emite($2.cod, crArgPos(sim.desp), crArgPos($3.pos), crArgPos(sim.desp));
       }
 
-      $$.pos = crearVarTemp();
+      $$.pos = creaVarTemp();
       emite(EASIG, crArgPos(sim.desp), crArgNul(), crArgPos($$.pos));
       
     }
@@ -280,7 +279,7 @@ expresion
             $$.tipo = dim.telem;
         }
 
-        $$.pos = crearVarTemp();
+        $$.pos = creaVarTemp();
         emite(EAV, crArgPos(sim.desp), crArgPos($3.pos), crArgPos($$.pos));
         if ($5.cod != EASIG) {
           emite($5.cod, crArgPos($$.pos), crArgPos($6.pos), crArgPos($$.pos));
@@ -313,8 +312,9 @@ expresion
         }
       }
 
-      $$.pos = crearVarTemp();
-      emite(ESUM, crArgPos(sim.desp), crArgPos(cam.desp), crArgPos($$.pos));
+      $$.pos = creaVarTemp();
+      int pos = sim.desp + cam.desp;
+      emite(EASIG, crArgPos($5.pos), crArgNul(), crArgPos(pos));
       emite(EASIG, crArgPos($5.pos), crArgNul(), crArgPos($$.pos));
     }
   ;
@@ -335,10 +335,10 @@ expresionLogica
         $$.tipo = T_LOGICO;
       }
 
-      $$.pos = crearVarTemp();
-      emite($2, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos))
+      $$.pos = creaVarTemp();
+      emite($2, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos));
       if ($2 == ESUM) {
-        emite(EMENEQ, crArgPos($$.pos), crArgEnt(1), si + 2);
+        emite(EMENEQ, crArgPos($$.pos), crArgEnt(1), crArgEtq(si + 2));
         emite(EASIG, crArgEnt(1), crArgNul(), crArgPos($$.pos));
       }
     }
@@ -361,7 +361,7 @@ expresionIgualdad
         $$.tipo = T_LOGICO;
       }
 
-      $$.pos = crearVarTemp();
+      $$.pos = creaVarTemp();
       emite(EASIG, crArgEnt(1), crArgNul(), crArgPos($$.pos));
       emite($2, crArgPos($1.pos), crArgPos($3.pos), crArgEtq(si + 2));
       emite(EASIG, crArgEnt(0), crArgNul(), crArgPos($$.pos));
@@ -385,7 +385,7 @@ expresionRelacional
         $$.tipo = T_LOGICO;
       }
 
-      $$.pos = crearVarTemp();
+      $$.pos = creaVarTemp();
       emite(EASIG, crArgEnt(1), crArgNul(), crArgPos($$.pos));
       emite($2, crArgPos($1.pos), crArgPos($3.pos), crArgEtq(si + 2));
       emite(EASIG, crArgEnt(0), crArgNul(), crArgPos($$.pos));
@@ -414,10 +414,10 @@ expresionAditiva
         $$.tipo = T_ENTERO;
       }
 
-	    $$.pos = crearVarTemp();
+	    $$.pos = creaVarTemp();
 
 	    /************** Expresion a partir de un operador aritmetico */
-	    emite($2, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos))
+	    emite($2, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos));
     }
   ;
 
@@ -443,10 +443,10 @@ expresionMultiplicativa
         $$.tipo = T_ENTERO;
       }
       
-      $$.pos = crearVarTemp();
+      $$.pos = creaVarTemp();
 	    
       /********** Expresion a partir de un operador multiplicativo */
-	    emite($2, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos))
+	    emite($2, crArgPos($1.pos), crArgPos($3.pos), crArgPos($$.pos));
     }
   ;
 
@@ -472,17 +472,17 @@ expresionUnaria
         $$.tipo = $1.tipo;
       }
 
-	    $$.pos = crearVarTemp();
+	    $$.pos = creaVarTemp();
 
       if ( $$.tipo == T_ENTERO)
       {
         /************** Expresion a partir de un operador unario de tipo entero */
-        emite($1.cod, crArgPos($2.pos), crArgNul(), crArgPos($$.pos))
+        emite($1.cod, crArgPos($2.pos), crArgNul(), crArgPos($$.pos));
       }
       else
       {
         /************** Expresion a partir de un operador unario de tipo lógico */
-        emite($1.cod, crArgEnt(1), crArgPos($2.pos), crArgPos($$.pos))
+        emite($1.cod, crArgEnt(1), crArgPos($2.pos), crArgPos($$.pos));
       }
     }
   | operadorIncremento ID_
@@ -494,10 +494,10 @@ expresionUnaria
       } else if (sim.tipo != T_ENTERO) {
         yyerror("Incomptabilidad de tipos, debe ser entero");
       } else {
-        $$ = T_ENTERO;
+        $$.tipo = T_ENTERO;
       }
 
-      $$.pos = crearVarTemp();
+      $$.pos = creaVarTemp();
 
       /* Primero se suma el identificador y luego se asigna */
       emite($1, crArgPos(sim.desp), crArgEnt(1), crArgPos(sim.desp));
@@ -522,7 +522,7 @@ expresionSufija
         $$.tipo = T_ENTERO;
       }
 
-      $$.pos = crearVarTemp();
+      $$.pos = creaVarTemp();
 
       /* Primero se asigna y luego se suma el identificador */
       emite(EASIG, crArgPos(sim.desp), crArgNul(), crArgPos($$.pos));
@@ -546,7 +546,7 @@ expresionSufija
         $$.tipo = dim.telem;
       }
 
-      $$.pos = crearVarTemp();
+      $$.pos = creaVarTemp();
       emite(EAV, crArgPos(sim.desp), crArgPos($3.pos), crArgPos($$.pos));
     }
   | ID_
@@ -560,7 +560,7 @@ expresionSufija
         $$.tipo = sim.tipo;
       }
 
-      $$.pos = crearVarTemp();
+      $$.pos = creaVarTemp();
       emite(EASIG, crArgPos(sim.desp), crArgNul(), crArgPos($$.pos));
     }
   | ID_ PUNTO_ ID_
@@ -582,14 +582,15 @@ expresionSufija
         }
       }
 
-      $$.pos = crearVarTemp();
-      emite(ESUM, crArgPos(sim.desp), crArgPos(cam.desp), crArgPos($$.pos));
+      $$.pos = creaVarTemp();
+      int pos = sim.desp + cam.desp;
+      emite(EASIG, crArgPos(pos), crArgNul(), crArgPos($$.pos));
     }
   | constante
     {
-      $$.tipo = $1;
+      $$.tipo = $1.tipo;
 
-      $$.pos = crearVarTemp();
+      $$.pos = creaVarTemp();
       emite(EASIG, crArgEnt($1.num), crArgNul(), crArgPos($$.pos));
     }
   ;
@@ -625,47 +626,47 @@ operadorAsignacion
     }
   | MENOSASIG_
     {
-      $$ = T_ENTERO;
+      $$.tipo = T_ENTERO;
       $$.cod = EDIF;
     }
   | PORASIG_
     {
-      $$ = T_ENTERO;
+      $$.tipo = T_ENTERO;
       $$.cod = EMULT;
     }
   | DIVASIG_
     {
-      $$ = T_ENTERO;
+      $$.tipo = T_ENTERO;
       $$.cod = EDIVI;
     }
   ;
 
 operadorLogico
-  : AND_ { $$ = EMULT}
-  | OR_ { $$ = ESUM}
+  : AND_ { $$ = EMULT;}
+  | OR_ { $$ = ESUM;}
   ;
 
 operadorIgualdad
-  : IGU_ { $$ = EIGUAL}
-  | DIST_ { $$ = EDIST}
+  : IGU_ { $$ = EIGUAL;}
+  | DIST_ { $$ = EDIST;}
   ;
 
 operadorRelacional
-  : MAY_ 	{ $$ = EMAY }
-  | MEN_ 	{ $$ = EMEN }
-  | MAYIGU_ { $$ = EMAYEQ }
-  | MENIGU_ { $$ = EMENEQ }
+  : MAY_ 	{ $$ = EMAY; }
+  | MEN_ 	{ $$ = EMEN; }
+  | MAYIGU_ { $$ = EMAYEQ; }
+  | MENIGU_ { $$ = EMENEQ; }
   ;
 
 operadorAditivo
-  : MAS_ 	{ $$ = ESUM }
-  | MENOS_ 	{ $$ = EDIF }
+  : MAS_ 	{ $$ = ESUM; }
+  | MENOS_ 	{ $$ = EDIF; }
   ;
 
 operadorMultiplicativo
-  : POR_ 	{ $$ = EMULT }
-  | DIV_ 	{ $$ = EDIVI }
-  | MOD_ 	{ $$ = RESTO }
+  : POR_ 	{ $$ = EMULT; }
+  | DIV_ 	{ $$ = EDIVI; }
+  | MOD_ 	{ $$ = RESTO; }
   ;
 
 operadorUnario

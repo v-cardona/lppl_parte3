@@ -45,12 +45,8 @@ struct OperadorStruct {    /* Estructura para los campos del operador */
 
 struct ConstanteStruct {    /* Estructura para los campos de las constantes */
   int tipo;
-  int cod;
+  int num;
 }CONSTANTESTRUCT;
 
-struct InstruccionStruct {    /* Estructura para el while */
-  int ini;
-  int fin;
-}INSTRUCCIONSTRUCT;
 #endif  /* _HEADER_H */
 /*****************************************************************************/
