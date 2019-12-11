@@ -81,6 +81,7 @@ declaracion
         else if (! insTdS($2, $1, dvar, -1)) {
           yyerror("Identificador repetido");
         } else {
+          emite(EASIG,crArgEnt($4.num),crArgNul(), crArgPos(dvar));
           dvar += TALLA_TIPO_SIMPLE;
         }
       }
@@ -164,14 +165,14 @@ instruccionEntradaSalida
       } else if (sim.tipo != T_ENTERO) {
         yyerror("El argumento del read debe ser entero");
       }
-      emite(EREAD, crArgNul(), crArgNul(), crArgNul(sim.desp));
+      emite(EREAD, crArgNul(), crArgNul(), crArgPos(sim.desp));
     }
   | PRINT_ APAR_ expresion CPAR_ DELI_
     {
       if ($3.tipo != T_ENTERO && $3.tipo != T_ERROR) {
         yyerror("El argumento del print debe ser entero");
       }
-      emite(EWRITE, crArgNul(), crArgNul(), crArgNul($3.pos));
+      emite(EWRITE, crArgNul(), crArgNul(), crArgPos($3.pos));
     }
   ;
 
@@ -234,7 +235,7 @@ expresion
 
       if (sim.tipo == T_ERROR) {
         yyerror("Objeto no declarado");
-      } else if (! ((sim.tipo == $3.tipo == T_ENTERO) || (sim.tipo == $3.tipo == T_LOGICO))) {
+      } else if (! ((sim.tipo == T_ENTERO && $3.tipo == T_ENTERO) || (sim.tipo == T_LOGICO && $3.tipo == T_LOGICO))) {
         if ($3.tipo != T_ERROR) {
           yyerror("Tipos incompatibles en la asignacion");
         }
@@ -283,6 +284,8 @@ expresion
         emite(EAV, crArgPos(sim.desp), crArgPos($3.pos), crArgPos($$.pos));
         if ($5.cod != EASIG) {
           emite($5.cod, crArgPos($$.pos), crArgPos($6.pos), crArgPos($$.pos));
+        } else {
+          emite(EASIG, crArgPos($6.pos), crArgNul(), crArgPos($$.pos));
         }
         emite(EVA, crArgPos(sim.desp), crArgPos($3.pos), crArgPos($$.pos));
       }
@@ -401,7 +404,7 @@ expresionAditiva
     {
       $$.tipo = T_ERROR;
 
-      if (! ($1.tipo == $3.tipo == T_ENTERO))
+      if (! ($1.tipo ==  T_ENTERO && $3.tipo == T_ENTERO))
       {
         // Si los operandos no son enteros y todavía no se ha lanzado el error, lo lanzamos.
         if ($1.tipo != T_ERROR && $3.tipo != T_ERROR)
@@ -430,7 +433,7 @@ expresionMultiplicativa
     {
       $$.tipo = T_ERROR;
 
-      if (! ($1.tipo == $3.tipo == T_ENTERO))
+      if (! ($1.tipo == T_ENTERO && $3.tipo == T_ENTERO))
       {
         // Si los operandos no son de tipo entero y todavía no se ha lanzado el error, lo lanzamos.
         if ($1.tipo != T_ERROR && $3.tipo != T_ERROR)
@@ -477,7 +480,7 @@ expresionUnaria
       if ( $$.tipo == T_ENTERO)
       {
         /************** Expresion a partir de un operador unario de tipo entero */
-        emite($1.cod, crArgPos($2.pos), crArgNul(), crArgPos($$.pos));
+        emite($1.cod, crArgEnt(0), crArgPos($2.pos), crArgPos($$.pos));
       }
       else
       {
@@ -673,12 +676,12 @@ operadorUnario
   : MAS_
     {
       $$.tipo = T_ENTERO;
-      $$.cod = EASIG;
+      $$.cod = ESUM;
     }
   | MENOS_
     {
       $$.tipo = T_ENTERO;
-      $$.cod = EASIG;
+      $$.cod = EDIF;
     }
   | NOT_
     {

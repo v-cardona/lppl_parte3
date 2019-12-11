@@ -1,34 +1,36 @@
-  0 EASIG     p:   0  ,          ,  p:   2  
-  1 ESUM      p:   0  ,  i:   1  ,  p:   0  
-  2 EWRITE            ,          ,          
-  3 EASIG     p:   0  ,          ,  p:   3  
-  4 EWRITE            ,          ,          
-  5 ESUM      p:   0  ,  i:   1  ,  p:   0  
-  6 EASIG     p:   0  ,          ,  p:   4  
-  7 EWRITE            ,          ,          
-  8 EASIG     p:   0  ,          ,  p:   5  
-  9 EWRITE            ,          ,          
- 10 EASIG     p:   0  ,          ,  p:   6  
- 11 ESUM      p:   1  ,  p:   6  ,  p:   1  
- 12 EASIG     p:   1  ,          ,  p:   7  
- 13 EWRITE            ,          ,          
- 14 EASIG     p:   1  ,          ,  p:   8  
- 15 EWRITE            ,          ,          
- 16 EASIG     p:   0  ,          ,  p:   9  
- 17 EDIF      p:   1  ,  p:   9  ,  p:   1  
- 18 EASIG     p:   1  ,          ,  p:  10  
- 19 EWRITE            ,          ,          
- 20 EASIG     p:   0  ,          ,  p:  11  
- 21 EMULT     p:   1  ,  p:  11  ,  p:   1  
- 22 EASIG     p:   1  ,          ,  p:  12  
- 23 EWRITE            ,          ,          
- 24 EASIG     p:   0  ,          ,  p:  13  
- 25 EDIVI     p:   1  ,  p:  13  ,  p:   1  
- 26 EASIG     p:   1  ,          ,  p:  14  
- 27 EWRITE            ,          ,          
- 28 EASIG     i:  28  ,          ,  p:  15  
- 29 EASIG     p:  15  ,          ,  p:   0  
- 30 EASIG     p:   0  ,          ,  p:  16  
- 31 EWRITE            ,          ,          
- 32 EASIG     p:   0  ,          ,  p:  17  
- 33 EWRITE            ,          ,          
+  0 EASIG     i:   2  ,          ,  p:   0  
+  1 EASIG     i:   7  ,          ,  p:   1  
+  2 EASIG     p:   0  ,          ,  p:   2  
+  3 ESUM      p:   0  ,  i:   1  ,  p:   0  
+  4 EWRITE            ,          ,  p:   2  
+  5 EASIG     p:   0  ,          ,  p:   3  
+  6 EWRITE            ,          ,  p:   3  
+  7 ESUM      p:   0  ,  i:   1  ,  p:   0  
+  8 EASIG     p:   0  ,          ,  p:   4  
+  9 EWRITE            ,          ,  p:   4  
+ 10 EASIG     p:   0  ,          ,  p:   5  
+ 11 EWRITE            ,          ,  p:   5  
+ 12 EASIG     p:   0  ,          ,  p:   6  
+ 13 ESUM      p:   1  ,  p:   6  ,  p:   1  
+ 14 EASIG     p:   1  ,          ,  p:   7  
+ 15 EWRITE            ,          ,  p:   7  
+ 16 EASIG     p:   1  ,          ,  p:   8  
+ 17 EWRITE            ,          ,  p:   8  
+ 18 EASIG     p:   0  ,          ,  p:   9  
+ 19 EDIF      p:   1  ,  p:   9  ,  p:   1  
+ 20 EASIG     p:   1  ,          ,  p:  10  
+ 21 EWRITE            ,          ,  p:  10  
+ 22 EASIG     p:   0  ,          ,  p:  11  
+ 23 EMULT     p:   1  ,  p:  11  ,  p:   1  
+ 24 EASIG     p:   1  ,          ,  p:  12  
+ 25 EWRITE            ,          ,  p:  12  
+ 26 EASIG     p:   0  ,          ,  p:  13  
+ 27 EDIVI     p:   1  ,  p:  13  ,  p:   1  
+ 28 EASIG     p:   1  ,          ,  p:  14  
+ 29 EWRITE            ,          ,  p:  14  
+ 30 EASIG     i:  28  ,          ,  p:  15  
+ 31 EASIG     p:  15  ,          ,  p:   0  
+ 32 EASIG     p:   0  ,          ,  p:  16  
+ 33 EWRITE            ,          ,  p:  16  
+ 34 EASIG     p:   0  ,          ,  p:  17  
+ 35 EWRITE            ,          ,  p:  17  
