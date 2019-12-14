@@ -107,7 +107,7 @@ declaracion
         if (! insTdS($5, T_RECORD, dvar, $3.ref)) {
           yyerror("Identificador repetido");
         } else {
-          dvar += TALLA_TIPO_SIMPLE;
+          dvar += $3.talla;
         }
       }
   ;
